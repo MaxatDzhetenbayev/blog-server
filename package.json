@@ -1,5 +1,26 @@
 {
-  "dependencies": {
-    "express": "^4.18.2"
-  }
+	"dependencies": {
+		"express": "^4.18.2",
+		"mongoose": "^6.9.1",
+		"nodemon": "^2.0.20"
+	},
+	"name": "blog-server",
+	"type": "module",
+	"version": "1.0.0",
+	"main": "index.js",
+	"scripts": {
+		"start:dev": "nodemon index.js",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/MaxatDzhetenbayev/blog-server.git"
+	},
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/MaxatDzhetenbayev/blog-server/issues"
+	},
+	"homepage": "https://github.com/MaxatDzhetenbayev/blog-server#readme",
+	"description": ""
 }
