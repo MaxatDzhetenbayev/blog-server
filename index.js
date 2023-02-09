@@ -1,10 +1,69 @@
 import express from 'express';
 import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt'
+import { validationResult } from 'express-validator';
+
+import UserModel from './models/User.js'
+import { registerValidation } from './validations/auth.js'
 
 const app = express();
 
-mongoose.connect('mongodb+srv://Yaboku:<18092002m>@cluster0.eb5nmyz.mongodb.net/?retryWrites=true&w=majority')
+app.use(express.json())
 
+mongoose.set("strictQuery", false);
+
+mongoose
+	.connect('mongodb+srv://Yaboku:312359maks@cluster0.eb5nmyz.mongodb.net/blog?retryWrites=true&w=majority',
+		{
+			useNewUrlParser: true,
+			useFindAndModify: false,
+			useUnifiedTopology: true
+		})
+
+
+app.post('/auth/register', registerValidation, async (req, res) => {
+
+	try {
+		const errors = validationResult(req)
+		if (!errors.isEmpty()) {
+			return res.status(400).json(errors.array())
+		}
+
+		const password = req.body.password
+		const salt = await bcrypt.genSalt(10)
+		const hash = await bcrypt.hash(password, salt)
+
+		const doc = new UserModel({
+			email: req.body.email,
+			fullName: req.body.fullName,
+			avatarUrl: req.body.avatarUrl,
+			passwordHash: hash,
+		});
+
+		const user = await doc.save();
+
+		const token = jwt.sign({
+			_id: user._id
+		},
+			'secret123',
+			{
+				expiresIn: '1d'
+			})
+
+		const { passwordHash, ...userData } = user._doc
+
+		res.status(300).json({
+			...userData,
+			token
+		});
+	} catch (err) {
+		console.log(err)
+		res.status(500).json({
+			message: 'Не удалось зарегестрироваться клиенту'
+		})
+	}
+})
 
 app.listen(4000, (err) => {
 	if (err) {
@@ -12,12 +71,3 @@ app.listen(4000, (err) => {
 	}
 	console.log('server is OK')
 })
-
-
-
-app.get("/", (req, res) => {
-	res.send('main page')
-})
-
-
-
