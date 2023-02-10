@@ -1,11 +1,11 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcrypt';
 import { validationResult } from 'express-validator';
 
-import UserModel from './models/User.js'
-import { registerValidation } from './validations/auth.js'
+import UserModel from './models/User.js';
+import { registerValidation } from './validations/auth.js';
 
 const app = express();
 
@@ -20,7 +20,6 @@ mongoose
 			useFindAndModify: false,
 			useUnifiedTopology: true
 		})
-
 
 app.post('/auth/register', registerValidation, async (req, res) => {
 
@@ -48,7 +47,7 @@ app.post('/auth/register', registerValidation, async (req, res) => {
 		},
 			'secret123',
 			{
-				expiresIn: '1d'
+				expiresIn: '7d'
 			})
 
 		const { passwordHash, ...userData } = user._doc
@@ -64,6 +63,46 @@ app.post('/auth/register', registerValidation, async (req, res) => {
 		})
 	}
 })
+
+
+app.post('/auth/login', async (req, res) => {
+
+
+	const user = await UserModel.findOne({ email: req.body.email })
+
+	if (!user) {
+		return res.status(404).json({
+			message: 'Пользователь не найден'
+		})
+	}
+
+
+	const isValidPassword = await bcrypt.compare(req.body.password, user._doc.passwordHash)
+
+	if (!isValidPassword) {
+		res.status(400).json({
+			message: 'Неверный логин или пароль'
+		})
+	}
+
+
+	const token = jwt.sign({
+		_id: user._id
+	},
+		'secret123',
+		{
+			expiresIn: '7d'
+		}
+	)
+
+	const { passwordHash, ...userData } = user._doc
+
+	res.status(300).json({
+		...userData,
+		token
+	});
+})
+
 
 app.listen(4000, (err) => {
 	if (err) {
