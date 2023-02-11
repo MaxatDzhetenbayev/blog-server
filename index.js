@@ -6,10 +6,18 @@ import { validationResult } from 'express-validator';
 
 import UserModel from './models/User.js';
 import { registerValidation } from './validations/auth.js';
+import checkAuth from './utils/checkAuth.js';
 
 const app = express();
 
 app.use(express.json())
+
+app.listen(4000, (err) => {
+	if (err) {
+		return console.log('server not working')
+	}
+	console.log('server is OK')
+})
 
 mongoose.set("strictQuery", false);
 
@@ -104,9 +112,20 @@ app.post('/auth/login', async (req, res) => {
 })
 
 
-app.listen(4000, (err) => {
-	if (err) {
-		return console.log('server not working')
+app.get('/auth/me', checkAuth, async (req, res) => {
+	try {
+		const user = await UserModel.findById(req.userId);
+
+		const { passwordHash, ...userData } = user._doc;
+
+		res.json(userData);
+
+	} catch (err) {
+		console.log(err)
+		res.status(500).json({
+			message: 'Нет доступа'
+		})
 	}
-	console.log('server is OK')
 })
+
+
