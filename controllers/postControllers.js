@@ -8,7 +8,7 @@ export const createPost = async (req, res) => {
 			text: req.body.text,
 			image: req.body.image,
 			tags: req.body.tags,
-			author: req.userId
+			user: req.userId
 		})
 
 		const post = await doc.save();
@@ -22,9 +22,24 @@ export const createPost = async (req, res) => {
 	}
 }
 
+export const getLastTags = async (req, res) => {
+	try {
+		const posts = await PostModel.find().limit(5).exec();
+
+		const tags = posts.map(post => post.tags).flat().slice(0.5)
+
+		res.status(200).json(tags)
+	}
+	catch (err) {
+		res.status(404).json({
+			message: 'Запрашиваемые теги не были найдены'
+		})
+	}
+}
+
 export const getAllPosts = async (req, res) => {
 	try {
-		const posts = await PostModel.find().populate('author').exec();
+		const posts = await PostModel.find().populate('user').exec();
 
 		res.status(200).json(posts)
 	}
