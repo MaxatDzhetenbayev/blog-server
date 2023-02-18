@@ -37,7 +37,7 @@ export const register = async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).json({
-			message: 'Не удалось зарегестрироваться клиенту'
+			message: 'Не удалось зарегестрироваться клиенту' + err 
 		})
 	}
 }
