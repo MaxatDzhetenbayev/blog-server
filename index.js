@@ -50,7 +50,7 @@ app.delete('/posts/:id', checkAuth, postControllers.deleteOnePost);
 app.patch('/posts/:id', checkAuth, postControllers.updatePost)
 
 
-app.post('/uploads', checkAuth, upload.single('image'), (req, res) => {
+app.post('/uploads', upload.single('image'), (req, res) => {
 	try {
 		res.status(200).json({
 			message: `/uploads/${req.file.originalname}`

@@ -80,7 +80,7 @@ export const getOnePosts = (req, res) => {
 
 				res.status(200).json(doc)
 			}
-		)
+		).populate('user').exec();
 	} catch (err) {
 		console.log(err)
 		res.status(404).json({
