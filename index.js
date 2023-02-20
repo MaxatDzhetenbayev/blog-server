@@ -49,6 +49,9 @@ app.get('/posts/:id', postControllers.getOnePosts);
 app.delete('/posts/:id', checkAuth, postControllers.deleteOnePost);
 app.patch('/posts/:id', checkAuth, postControllers.updatePost)
 
+app.get('/posts/sort/popular', postControllers.getPopularPosts)
+app.get('/posts/sort/news', postControllers.getNewPosts)
+
 
 app.post('/uploads', upload.single('image'), (req, res) => {
 	try {

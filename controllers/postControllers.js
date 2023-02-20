@@ -13,10 +13,10 @@ export const createPost = async (req, res) => {
 
 		const post = await doc.save();
 
-		res.json(post)
+		return res.json(post)
 	} catch (err) {
 		console.log(err)
-		res.status(400).json({
+		return res.status(400).json({
 			message: 'Не удалось создать пост'
 		})
 	}
@@ -28,10 +28,10 @@ export const getLastTags = async (req, res) => {
 
 		const tags = posts.map(post => post.tags).flat().slice(0.5)
 
-		res.status(200).json(tags)
+		return res.status(200).json(tags)
 	}
 	catch (err) {
-		res.status(404).json({
+		return res.status(404).json({
 			message: 'Запрашиваемые теги не были найдены'
 		})
 	}
@@ -41,14 +41,41 @@ export const getAllPosts = async (req, res) => {
 	try {
 		const posts = await PostModel.find().populate('user').exec();
 
-		res.status(200).json(posts)
+		return res.status(200).json(posts)
 	}
 	catch (err) {
-		res.status(404).json({
+		return res.status(404).json({
 			message: 'Запрашиваемые посты не были найдены'
 		})
 	}
 }
+
+export const getPopularPosts = async (req, res) => {
+	try {
+		const posts = await PostModel.find().sort({ viewsCount: -1 }).populate('user').exec();
+
+		return res.status(200).json(posts)
+	}
+	catch (err) {
+		return res.status(404).json({
+			message: 'Запрашиваемые посты не были найдены'
+		})
+	}
+}
+
+export const getNewPosts = async (req, res) => {
+	try {
+		const posts = await PostModel.find().sort({ createdAt: -1 }).populate('user').exec();
+
+		return res.status(200).json(posts)
+	}
+	catch (err) {
+		return res.status(404).json({
+			message: 'Запрашиваемые посты не были найдены'
+		})
+	}
+}
+
 
 export const getOnePosts = (req, res) => {
 	try {
@@ -59,7 +86,7 @@ export const getOnePosts = (req, res) => {
 				_id: postId
 			},
 			{
-				$inc: { viesCount: 1 }
+				$inc: { viewsCount: 1 }
 			},
 			{
 				returnDocument: 'after'
@@ -67,23 +94,23 @@ export const getOnePosts = (req, res) => {
 			(err, doc) => {
 				if (err) {
 					console.log(err)
-					res.status(500).json({
+					return res.status(500).json({
 						message: 'Не удалось вернуть статью'
 					})
 				}
 
 				if (!doc) {
-					res.status(404).json({
+					return res.status(404).json({
 						message: 'Статья не найдена'
 					})
 				}
 
-				res.status(200).json(doc)
+				return res.status(200).json(doc)
 			}
 		).populate('user').exec();
 	} catch (err) {
 		console.log(err)
-		res.status(404).json({
+		return res.status(404).json({
 			message: 'Запрашиваемые пост не были найдены'
 		})
 	}
@@ -99,17 +126,17 @@ export const deleteOnePost = (req, res) => {
 		},
 		(err, doc) => {
 			if (err) {
-				res.status(500).json({
+				return res.status(500).json({
 					message: 'Не удалось удалить статью'
 				})
 			}
 			if (!doc) {
-				res.status(404).json({
+				return res.status(404).json({
 					message: 'Не удалось найти статью'
 				})
 			}
 
-			res.status(200).json({
+			return res.status(200).json({
 				messsage: 'Статья удалена'
 			})
 		}
@@ -133,14 +160,15 @@ export const updatePost = async (req, res) => {
 			}
 		)
 
-		res.json(200).json({
+		return res.status(200).json({
 			message: 'Статья обновлена'
 		})
 
 	} catch (err) {
-		res.json(500).json({
+		return res.status(500).json({
 			message: 'Не удалось обновить статью'
 		})
+
 	}
 
 }
