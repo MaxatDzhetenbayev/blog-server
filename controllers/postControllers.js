@@ -22,21 +22,6 @@ export const createPost = async (req, res) => {
 	}
 }
 
-export const getLastTags = async (req, res) => {
-	try {
-		const posts = await PostModel.find().limit(5).exec();
-
-		const tags = posts.map(post => post.tags).flat().slice(0.5)
-
-		return res.status(200).json(tags)
-	}
-	catch (err) {
-		return res.status(404).json({
-			message: 'Запрашиваемые теги не были найдены'
-		})
-	}
-}
-
 export const getAllPosts = async (req, res) => {
 	try {
 		const posts = await PostModel.find().populate('user').exec();
@@ -51,8 +36,22 @@ export const getAllPosts = async (req, res) => {
 }
 
 export const getPopularPosts = async (req, res) => {
+
+	const reqTag = req.query.tag
+
 	try {
 		const posts = await PostModel.find().sort({ viewsCount: -1 }).populate('user').exec();
+
+		if (reqTag) {
+			const postForeach = (posts) => {
+				return posts.filter((post) => {
+					return post.tags.includes(reqTag)
+				})
+			}
+
+			const filteredPosts = postForeach(posts)
+			return res.status(200).json(filteredPosts)
+		}
 
 		return res.status(200).json(posts)
 	}
@@ -64,8 +63,22 @@ export const getPopularPosts = async (req, res) => {
 }
 
 export const getNewPosts = async (req, res) => {
+
+	const reqTag = req.query.tag
+
 	try {
 		const posts = await PostModel.find().sort({ createdAt: -1 }).populate('user').exec();
+
+		if (reqTag) {
+			const postForeach = (posts) => {
+				return posts.filter((post) => {
+					return post.tags.includes(reqTag)
+				})
+			}
+
+			const filteredPosts = postForeach(posts)
+			return res.status(200).json(filteredPosts)
+		}
 
 		return res.status(200).json(posts)
 	}
@@ -75,7 +88,6 @@ export const getNewPosts = async (req, res) => {
 		})
 	}
 }
-
 
 export const getOnePosts = (req, res) => {
 	try {
@@ -111,7 +123,7 @@ export const getOnePosts = (req, res) => {
 	} catch (err) {
 		console.log(err)
 		return res.status(404).json({
-			message: 'Запрашиваемые пост не были найдены'
+			message: 'Запрашиваемый пост не были найдены'
 		})
 	}
 }
@@ -172,3 +184,19 @@ export const updatePost = async (req, res) => {
 	}
 
 }
+
+export const getLastTags = async (req, res) => {
+	try {
+		const posts = await PostModel.find().limit(5).exec();
+
+		const tags = posts.map(post => post.tags).flat().slice(0.5)
+
+		return res.status(200).json(tags)
+	}
+	catch (err) {
+		return res.status(404).json({
+			message: 'Запрашиваемые теги не были найдены'
+		})
+	}
+}
+
