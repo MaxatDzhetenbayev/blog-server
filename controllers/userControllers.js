@@ -57,7 +57,7 @@ export const login = async (req, res) => {
 	const isValidPassword = await bcrypt.compare(req.body.password, user._doc.passwordHash)
 
 	if (!isValidPassword) {
-		res.status(400).json({
+		return res.status(400).json({
 			message: 'Неверный логин или пароль'
 		})
 	}
@@ -74,7 +74,7 @@ export const login = async (req, res) => {
 
 	const { passwordHash, ...userData } = user._doc
 
-	res.status(300).json({
+	return res.status(300).json({
 		...userData,
 		token
 	});
