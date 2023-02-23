@@ -22,9 +22,17 @@ export const createPost = async (req, res) => {
 	}
 }
 
+
 export const getAllPosts = async (req, res) => {
 	try {
-		const posts = await PostModel.find().populate('user').exec();
+		const posts = await PostModel
+			.find()
+			.populate(['user', 'comments'])
+			.populate({
+				path: 'comments',
+				populate: { path: 'user' }
+			})
+			.exec()
 
 		return res.status(200).json(posts)
 	}
@@ -40,7 +48,15 @@ export const getPopularPosts = async (req, res) => {
 	const reqTag = req.query.tag
 
 	try {
-		const posts = await PostModel.find().sort({ viewsCount: -1 }).populate('user').exec();
+		const posts = await PostModel
+			.find()
+			.sort({ viewsCount: -1 })
+			.populate(['user', 'comments'])
+			.populate({
+				path: 'comments',
+				populate: { path: 'user' }
+			})
+			.exec()
 
 		if (reqTag) {
 			const postForeach = (posts) => {
@@ -66,8 +82,17 @@ export const getNewPosts = async (req, res) => {
 
 	const reqTag = req.query.tag
 
+
 	try {
-		const posts = await PostModel.find().sort({ createdAt: -1 }).populate('user').exec();
+		const posts = await PostModel
+			.find()
+			.sort({ createdAt: -1 })
+			.populate(['user', 'comments'])
+			.populate({
+				path: 'comments',
+				populate: { path: 'user' }
+			})
+			.exec()
 
 		if (reqTag) {
 			const postForeach = (posts) => {
@@ -119,7 +144,12 @@ export const getOnePosts = (req, res) => {
 
 				return res.status(200).json(doc)
 			}
-		).populate('user').exec();
+		).populate(['user', 'comments'])
+			.populate({
+				path: 'comments',
+				populate: { path: 'user' }
+			})
+			.exec()
 	} catch (err) {
 		console.log(err)
 		return res.status(404).json({
@@ -200,3 +230,27 @@ export const getLastTags = async (req, res) => {
 	}
 }
 
+
+export const createComment = async (req, res) => {
+
+	const postId = req.params.id;
+	const { _id, fullName, avatarUrl } = req.userId
+
+	try {
+		await PostModel.updateOne(
+			{
+				_id: postId
+			},
+			{
+				comment: {
+					user: { _id, fullName, avatarUrl },
+					text: req.body.text
+				}
+			}
+		).populate('user').exec()
+
+		return res.status(200).json({ message: 'Комментарий создан' })
+	} catch (err) {
+		return res.status(500).json({ message: 'ошибка при созданий комментария' })
+	}
+}

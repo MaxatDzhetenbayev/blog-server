@@ -28,6 +28,7 @@ const PostSchema = new mongoose.Schema({
 		required: true
 	},
 	image: String,
+	comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }]
 }, {
 	timestamps: true,
 })
