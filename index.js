@@ -5,7 +5,7 @@ import cors from 'cors'
 
 import { postCreateValidations, registerValidation, loginValidation } from './validations/index.js'
 import { checkAuth, handleValidationErrors } from './utils/index.js'
-import { postControllers, userControllers } from './controllers/index.js'
+import { postControllers, userControllers, commentControllers } from './controllers/index.js'
 
 const app = express();
 
@@ -51,6 +51,8 @@ app.patch('/posts/:id', checkAuth, postControllers.updatePost)
 
 app.get('/posts/sort/popular', postControllers.getPopularPosts)
 app.get('/posts/sort/news', postControllers.getNewPosts)
+
+app.post('/comment/:id', checkAuth, commentControllers.createComment)
 
 
 app.post('/uploads', upload.single('image'), (req, res) => {
