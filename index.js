@@ -9,6 +9,10 @@ import { postControllers, userControllers, commentControllers } from './controll
 
 const app = express();
 
+
+const PORT = process.env.PORT || 4000
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://Yaboku:312359maks@cluster0.eb5nmyz.mongodb.net/blog?retryWrites=true&w=majority'
+
 app.use(express.json())
 app.use(cors())
 app.use('/uploads', express.static('uploads'))
@@ -29,7 +33,7 @@ const upload = multer({ storage })
 mongoose.set("strictQuery", false);
 
 mongoose
-	.connect('mongodb+srv://Yaboku:312359maks@cluster0.eb5nmyz.mongodb.net/blog?retryWrites=true&w=majority',
+	.connect(MONGO_URI,
 		{
 			useNewUrlParser: true,
 			useFindAndModify: false,
@@ -69,7 +73,7 @@ app.post('/uploads', upload.single('image'), (req, res) => {
 })
 
 
-app.listen(4000, (err) => {
+app.listen(PORT, (err) => {
 	if (err) {
 		return console.log('server not working')
 	}
