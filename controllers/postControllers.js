@@ -32,7 +32,7 @@ export const getAllPosts = async (req, res) => {
 				path: 'comments',
 				populate: { path: 'user' }
 			})
-			.exec()
+		
 
 		return res.status(200).json(posts)
 	}
@@ -56,7 +56,7 @@ export const getPopularPosts = async (req, res) => {
 				path: 'comments',
 				populate: { path: 'user' }
 			})
-			.exec()
+
 
 		if (reqTag) {
 			const postForeach = (posts) => {
@@ -92,7 +92,7 @@ export const getNewPosts = async (req, res) => {
 				path: 'comments',
 				populate: { path: 'user' }
 			})
-			.exec()
+
 
 		if (reqTag) {
 			const postForeach = (posts) => {
@@ -130,7 +130,6 @@ export const getOnePosts = (req, res) => {
 			},
 			(err, doc) => {
 				if (err) {
-					console.log(err)
 					return res.status(500).json({
 						message: 'Не удалось вернуть статью'
 					})
@@ -149,9 +148,8 @@ export const getOnePosts = (req, res) => {
 				path: 'comments',
 				populate: { path: 'user' }
 			})
-			.exec()
+
 	} catch (err) {
-		console.log(err)
 		return res.status(404).json({
 			message: 'Запрашиваемый пост не были найдены'
 		})
